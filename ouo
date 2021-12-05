@@ -1,0 +1,64 @@
+import requests
+import time
+from selenium import webdriver
+from keep_alive import keep_alive
+from fake_useragent import UserAgent
+from bs4 import BeautifulSoup
+
+
+def myweb(proxy):
+  ua=UserAgent()
+  agent=ua.ie
+  print(agent)
+  chrome_options=webdriver.ChromeOptions()
+  chrome_options.add_argument('--no-sandbox')
+  chrome_options.add_argument('--disable-dev-shm-usage')
+  chrome_options.add_argument('--proxy-server=%s' % proxy)
+  chrome_options.add_argument("--window-size=1920,1080")
+
+  chrome_options.add_argument("user-agent="+agent)
+  driver=webdriver.Chrome(chrome_options=chrome_options)
+  driver.implicitly_wait(10)
+  driver.get("https://techkreek.blogspot.com/2021/11/what-is-web-hosting-x-si-mply-puts-web.html")
+  print(driver.execute_script("return navigator.userAgent"))
+  time.sleep(5)
+
+  driver.find_element_by_link_text("Best video on youtube").click()
+  return driver
+
+def ouo(driver):
+  time.sleep(5)
+  driver.implicitly_wait(10)
+  driver.find_element_by_xpath('//*[@id="form-captcha"]/input[4]').click()
+  time.sleep(6)
+  driver.find_element_by_id("btn-main").click()
+  return driver
+
+def scraping():
+  url='https://www.sslproxies.org/'
+  r=requests.get(url)
+  soup=BeautifulSoup(r.content,'html5lib')
+  tbody=soup.find('tbody')
+  tr=tbody.findAll('tr')
+
+  for i in tr:
+    td=i.findAll('td')
+          
+    if (td[4]).text=='elite proxy':
+      proxy=(td[0].text+':'+td[1].text)
+      print(proxy)
+      return proxy
+
+keep_alive()
+
+while True:
+  try:
+    proxy=scraping()
+    driver=myweb(proxy)
+    ouo(driver)
+
+  finally:
+    try:
+      driver.quit()
+    except:
+      pass
