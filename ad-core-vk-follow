@@ -1,0 +1,97 @@
+from selenium import webdriver
+import time
+from keep_alive import keep_alive
+
+def main():
+  options=webdriver.ChromeOptions()
+  options.add_argument('--no-sandbox')
+  options.add_argument('--disable-dev-shm-usage')
+  options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.81 Safari/537.36")
+  #options.add_argument("load-extension=ad-extension")
+
+
+  #options.add_argument("--headless")
+  driver=webdriver.Chrome(chrome_options=options)
+  driver.get("https://oauth.vk.com/authorize?client_id=5852328&display=popup&redirect_uri=https://ad-core.ru/oauth2callback.php&scope=65538&response_type=code&v=5.107&state=vk.0.9408f4bfb7aa61044445a2a614ce4563.go")
+
+  driver.find_element_by_name('email').send_keys('anasalam702@gmail.com')
+  driver.find_element_by_name('pass').send_keys('hcl@1234')
+  driver.find_element_by_id('install_allow').click()
+  #cookies=pickle.load(open("ad-core.pkl", "rb"))
+  #for cookie in cookies:
+  #  driver.add_cookie(cookie)
+
+  #input("Enter:- ")
+
+  #pickle.dump( driver.get_cookies() , open("ad-core.pkl","wb"))
+
+
+
+  def task():
+      try:
+        driver.get("https://ad-core.ru/ads-vk-sub")
+        try:
+          driver.find_element_by_xpath('/html/body/div[14]/div[2]/span').click()
+        except:
+          print('cookie banner not found')
+        print('ads-vk-sub opened')
+        driver.set_window_size(1800, 1080)
+        time.sleep(2)
+        print(driver.current_url)
+        try:
+          driver.find_element_by_xpath('/html/body/div[5]/div/div[2]/div/a[2]/p[1]').click()
+
+        except:
+          print('no more follows...sleeping')
+          driver.quit()
+          time.sleep(600)
+          main()
+
+        handles=driver.window_handles
+        driver.switch_to.window(handles[1])
+        
+        try:
+          driver.find_element_by_id('join_button').click()
+          print('Joined')
+
+        except:
+          try:
+            driver.find_element_by_id('public_subscribe').click()
+            print('Subscribed')
+          except:
+            print('already subscribed')
+
+        driver.maximize_window()
+        time.sleep(5)
+
+        driver.switch_to.window(handles[0])
+        
+        time.sleep(2)
+
+
+        driver.find_element_by_xpath('/html/body/div[5]/div/div[2]/div/a[2]/p[1]').click()
+        print('clicked on final button')
+        input()
+        time.sleep(4)
+        task()
+
+      except:
+        driver.quit()
+        print('task failed')
+        main()
+      
+
+  while True:
+    try:
+      task()
+    except:
+      driver.quit()
+      main()
+
+
+keep_alive()
+while True:
+  try:
+    main()
+  except:
+    pass
