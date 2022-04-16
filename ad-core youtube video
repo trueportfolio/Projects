@@ -1,0 +1,166 @@
+from selenium import webdriver
+import time
+from keep_alive import keep_alive
+import pickle
+
+
+options=webdriver.ChromeOptions()
+options.add_argument('--no-sandbox')
+options.add_argument('--disable-dev-shm-usage')
+options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.81 Safari/537.36")
+options.add_argument("load-extension=ad-extension")
+
+
+#options.add_argument("--headless")
+driver=webdriver.Chrome(chrome_options=options)
+driver.get("https://oauth.vk.com/authorize?client_id=5852328&display=popup&redirect_uri=https://ad-core.ru/oauth2callback.php&scope=65538&response_type=code&v=5.107&state=vk.0.9408f4bfb7aa61044445a2a614ce4563.go")
+
+driver.find_element_by_name('email').send_keys('anasalam702@gmail.com')
+driver.find_element_by_name('pass').send_keys('hcl@1234')
+driver.find_element_by_id('install_allow').click()
+#cookies=pickle.load(open("ad-core.pkl", "rb"))
+#for cookie in cookies:
+#  driver.add_cookie(cookie)
+
+driver.get("https://ad-core.ru/ads-yt-video")
+#input("Enter:- ")
+
+#pickle.dump( driver.get_cookies() , open("ad-core.pkl","wb"))
+
+
+
+
+
+def main():
+    try:
+      driver.get("https://ad-core.ru/ads-yt-video")
+      print('ads-yt-video opened')
+      driver.maximize_window()
+      time.sleep(2)
+
+      def task(link):
+        print(link)
+        driver.get(link)
+
+        if driver.current_url!=link:
+          main()
+
+        wait=int(driver.find_element_by_xpath('/html/body/div[4]/div/div[2]/div/div[4]/p/a').get_attribute('data-time'))+6
+        
+        driver.find_element_by_xpath('/html/body/div[4]/div/div[2]/div/div[4]/p/a').click()
+        handles=driver.window_handles
+        driver.switch_to.window(handles[1])
+        driver.set_window_size(1920, 1080)
+      
+
+
+        if 'youtube' in driver.current_url:
+
+          if driver.title=='YouTube':
+            print('Video Unavailaible')
+            main()
+          
+          time.sleep(wait)
+          handles=driver.window_handles
+          driver.switch_to.window(handles[0])
+
+          try:
+            time.sleep(3)
+            driver.find_element_by_xpath('/html/body/div[4]/div/div[2]/div/div[5]/form/a').click()
+            print('completed....')
+            handles=driver.window_handles
+            driver.switch_to.window(handles[1])
+            driver.close()
+            driver.switch_to.window(handles[0])
+            
+
+          except:
+            print(f"{link} failed youtube")
+            handles=driver.window_handles
+            driver.switch_to.window(handles[1])
+            driver.close()
+            driver.switch_to.window(handles[0])
+            task(link)
+            
+
+
+        elif 'vk.com' in driver.current_url:
+          print('redirected in vk.com')
+          
+
+          time.sleep(5)
+
+          url_id=driver.current_url.split('wall')
+          
+
+          try:
+            xpath=f'//*[@id="wpt{url_id[1]}"]/div[2]/a/img'
+            driver.find_element_by_xpath(xpath).click()
+            handles=driver.window_handles
+            driver.close()
+            driver.switch_to.window(handles[2])
+
+          except:
+            try:
+              xpath=f'//*[@id="wpt{url_id[1]}"]/div[2]/a'
+              driver.find_element_by_xpath(xpath).click()
+              handles=driver.window_handles
+              driver.close()
+              driver.switch_to.window(handles[2])
+              
+            except:
+              task(link)
+
+          if driver.title=='- YouTube':
+            print('Video Unavailaible')
+            main()
+
+          driver.set_window_size(1920, 1080)
+          time.sleep(wait)
+          driver.switch_to.window(handles[0])
+
+          try:
+            time.sleep(2)
+            driver.find_element_by_xpath('/html/body/div[4]/div/div[2]/div/div[5]/form/a').click()
+            print('complete!...')
+            handles=driver.window_handles
+            driver.switch_to.window(handles[1])
+            driver.close()
+            driver.switch_to.window(handles[0])
+          
+          
+
+          except:
+            print(f"{link} vk failed...")
+            handles=driver.window_handles
+            driver.switch_to.window(handles[1])
+            driver.close()
+            driver.switch_to.window(handles[0])
+            task(link)
+
+      try:
+        link_id=driver.find_element_by_xpath('//*[@id="page_content"]/div[2]/div[2]').get_attribute('data-id')
+        link=f'https://ad-core.ru/show-movie/{link_id}'
+      except:
+        print('Cant find video,sleeping...')
+        time.sleep(1000)
+        print('moving to main()')
+        main()
+
+      try:
+        task(link)
+      except:
+        print("task failed...")
+        main() 
+
+    except:
+      pass
+
+
+keep_alive()
+
+while True:
+  try:
+    main()
+  except:
+    pass
