@@ -4,10 +4,11 @@ from keep_alive import keep_alive
 
 def start():
   options=webdriver.ChromeOptions()
-  options.add_extension("alexa.crx")
+  options.add_extension("alaxa.crx")
   options.add_argument("load-extension=rankboostup")
   options.add_argument('--no-sandbox')
   options.add_argument('--disable-dev-shm-usage')
+  
   #options.add_argument("--headless")
   driver=webdriver.Chrome(chrome_options=options)
   driver.get("https://rankboostup.com/dashboard/traffic-exchange/")
@@ -46,55 +47,5 @@ while True:
     
     start()
     print("1hour complete")
-  except:
-    pass
-
-"""
-
-from selenium import webdriver
-from keep_alive import keep_alive
-import time
-
-def start():
-  chrome_options = webdriver.ChromeOptions()
-  chrome_options.add_argument("--disable-dev-shm-usage")
-  chrome_options.add_argument("--no-sandbox")
-  chrome_options.add_extension("alexa.crx")
-  chrome_options.add_argument("load-extension=rankboostup")
-  driver = webdriver.Chrome(chrome_options=chrome_options)
-
-  driver.get("https://rankboostup.com/dashboard/traffic-exchange/")
-  driver.maximize_window()
-  driver.find_element_by_id('username').send_keys('idforcomment@gmail.com')
-  driver.find_element_by_name('password').send_keys('rankboostup.com')
-  driver.find_element_by_id('submit-form').click()
-  time.sleep(3)
-  driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-  
-  try:
-    driver.implicitly_wait(5)
-    driver.find_element_by_xpath('/html/body/section/div[2]/div[2]/div[5]/div/div/div[2]/table/tbody/tr/td[3]/form/button').click()
-    driver.find_element_by_xpath("/html/body/section/div[2]/div[2]/div[5]/div/div/div[2]/table/tbody/tr/td[4]/a").click()
-    
-    time.sleep(3)
-    driver.maximize_window()
-    driver.find_element_by_xpath("/html/body/div[2]/div[7]/div/button").click()
-
-  except:
-    driver.find_element_by_xpath("/html/body/section/div[2]/div[2]/div[5]/div/div/div[2]/table/tbody/tr/td[4]/a").click()
-    time.sleep(2)
-    driver.maximize_window()
-    driver.find_element_by_xpath("/html/body/div[2]/div[7]/div/button").click()
-    print('sleeping')
-    time.sleep(600)
-
-keep_alive()
-
-while True:
-  try:
-    start()
-  except:
-    time.sleep(200)
-    
-
-"""
+  except Exception as e:
+    print(e)
