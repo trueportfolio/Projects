@@ -1,0 +1,91 @@
+from selenium import webdriver
+#import pickle
+import time
+from keep_alive import keep_alive
+
+def a():
+  while True:
+    try:
+      d.maximize_window()
+      d.get("https://neon.today/advertise/ptp")
+      credits=int(d.find_element_by_id("ba").text)
+
+      
+      if credits>5:
+        d.find_element_by_xpath("/html/body/main/div[1]/div[2]/div[2]/div[2]/div/span").click()
+        d.find_element_by_id("amt").send_keys(credits)
+        d.find_element_by_xpath('//*[@id="ajax"]/a/i').click()
+        time.sleep(2)
+        print (f"{credits} Credits refilled")
+      
+      d.get("https://neon.today/dash/earn")
+      time.sleep(1)
+      
+      if d.current_url=="https://neon.today/dash/earn":
+        if "There is no active ads for this moment." in d.page_source:
+          print("There are no ads.")
+          time.sleep(600)
+          a()
+          
+        d.find_element_by_id("open").click()
+        print("clicked")
+        time.sleep(600)
+        handle=d.window_handles
+        for i in range(1,len(handle)):
+          print(i)
+          d.switch_to.window(handle[i])
+          d.close()
+          
+        d.switch_to.window(handle[0])
+        
+    finally:
+      pass
+      
+keep_alive()
+
+options=webdriver.ChromeOptions()
+options.add_argument('--no-sandbox')
+options.add_argument('--disable-dev-shm-usage')
+d=webdriver.Chrome(chrome_options=options)
+d.get("https://neon.today")
+
+
+
+cookies=[{'domain': '.neon.today', 'expiry': 9999999999, 'httpOnly': True, 'name': 'neontoday', 'path': '/', 'secure': True, 'value': 'b107tfnsv6thmgv8n5m3bm9geagm3fao'}]
+
+
+for cookie in cookies:
+  d.add_cookie(cookie)
+
+while True:
+  try:
+    a()
+    print("Restarting...")
+  except Exception as e:
+    print(e)
+
+
+"""
+import time
+from selenium import webdriver
+email='test5@gmail.com'
+options=webdriver.ChromeOptions()
+options.add_argument('--no-sandbox')
+options.add_argument('--disable-dev-shm-usage')
+
+
+d=webdriver.Chrome(chrome_options=options)
+d.get("https://neon.today/welcome/login")
+
+d.set_window_size(1000, 600)
+d.find_element_by_name("pochta").send_keys(email)
+d.find_element_by_name("password").send_keys("neon.today")
+captcha=int(input("Captcha:- "))
+d.find_element_by_name("captcha").send_keys(captcha)
+d.find_element_by_xpath('//*[@id="index-banner"]/div/div/div/form/input').click()
+
+
+time.sleep(3)
+print(d.get_cookies()[0]['value'])
+
+"""
