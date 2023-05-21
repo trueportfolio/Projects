@@ -1,23 +1,25 @@
-tickerSymbol = 'TATASTEEL.NS'
+from yfinance import download
+import datetime
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
 
-start_date = datetime.datetime(2022,1, 1)
-#start_date = datetime.datetime(2021, 7, 21)
 
+tickerSymbol = 'COLPAL.NS'
+
+start_date = datetime.datetime(2022,5, 21)
 end_date = datetime.datetime.now()
+#end_date = datetime.datetime(2015,1, 1)
 
-data=download(tickerSymbol, start=start_date, end=end_date).reset_index()[["Date","Close"]]
+data=download(tickerSymbol, start=start_date, end=end_date).reset_index()#[["Date","Close"]]
 
 
 purchase_data = pd.DataFrame(columns=['Date', 'Close','Hike','Quantity'])
 sell_data = pd.DataFrame(columns=['Date', 'Close','Hike','Quantity'])
-
 last_trad=data.Close[0]
 fund=0
 
 t_shares=0
-
-
-
 for i in range(len(data)):
     
     percent_hike=((data.Close[i]-last_trad)/last_trad)*100
@@ -47,7 +49,7 @@ for i in range(len(data)):
         #print(f"S {round(percent_hike,1)}, {round(sell_quantity)} x {round(data.Close[i],1)} = {round(sell_amount,1)}")        
         #print(f"Shares = {t_shares}, Fund = {fund}\n")
         
-    if percent_hike<-4:
+    if percent_hike<-3:
         #purchasing Signal
         
         purchase_quantity=round(percent_hike)
@@ -82,7 +84,7 @@ lst_price=data.Close[len(data)-1]
 total_purchase=trade_data["Cummulative Total"].values.max()
 total_sell=-sum(sell_data["Total"])
 
-profit=+current_shares_in_market*data.Close.values[-1]-total_purchase
+profit=total_sell+(lst_price*current_shares_in_market)-total_purchase
 
 print(f"\nFund In Market Currently = {current_shares_in_market} x {lst_price} = {current_shares_in_market*lst_price}")
 print(f"Amount Withdrawl = {round(total_sell+(lst_price*current_shares_in_market),2)}")
@@ -92,33 +94,29 @@ print(f"ROI= {round((profit)/total_purchase*100,2)}")
 
 print(f"Real ROI = {round((data.Close.values[-1]-data.Close.values[0])/data.Close.values[0]*100,2)}")
 
-shares_sell_in_loss=int(sum(purchase_data.where(purchase_data.Close>lst_price,0).Quantity)-sum(-sell_data["Quantity"]))
-print(f"Total {shares_sell_in_loss} shares are selled in loss.\n")
-
-
+#shares_sell_in_loss=int(sum(purchase_data.where(purchase_data.Close>lst_price,0).Quantity)-sum(-sell_data["Quantity"]))
+#print(f"Total {shares_sell_in_loss} shares are selled in loss.\n")
 
 
 
         
-
-
 #Plotting On Graph
-fig, ax = plt.subplots(figsize=(10, 4))  #Increase Graph Width
 
+fig, ax = plt.subplots(figsize=(10, 4))  #Increase Graph Width
 for index, row in sell_data.iterrows():
-    ax.text(row['Date'], row['Close'], int(-row['Quantity']), ha='center', va='bottom')
+    ax.text(row['Date'], row['Close'], int(row['Quantity']), ha='center', va='bottom')
     
 for index, row in purchase_data.iterrows():
     ax.text(row['Date'], row['Close'], int(row['Quantity']), ha='center', va='bottom')
 
-data.plot(kind='line',x="Date", y="Close", color='green', ax=ax)
+data.plot(kind='line',x="Date", y="Open", color='green', ax=ax)
 
 #trade_data.plot(kind='line',x="Date", y="Close", color='blue', ax=ax)
 
 sell_data.plot(kind='scatter',x="Date", y="Close", color='green', s=40, ax=plt.gca())
 purchase_data.plot(kind='scatter',x="Date", y="Close", color='red', s=40, ax=plt.gca())
 
-#plt.show()
+plt.show()
 
 trade_data
 
