@@ -1,0 +1,49 @@
+import pandas as pd
+import pandas_ta as ta
+import matplotlib.pyplot as plt
+from mplfinance.original_flavor import candlestick2_ochl
+from scipy.signal import argrelextrema
+import numpy as np
+import datetime
+from yfinance import download
+
+tickerSymbol = 'RELIANCE.NS'
+
+start_date = datetime.datetime(2022,1, 1)
+
+end_date = datetime.datetime.now()
+#end_date = datetime.datetime(2015,1, 1)
+
+df=download(tickerSymbol, start=start_date, end=end_date).reset_index()
+ohlc = df[['Open', 'High', 'Low', 'Close']]
+
+
+
+tickerSymbol = 'RELIANCE.NS'
+
+start_date = datetime.datetime(2020,9, 1)
+
+end_date = datetime.datetime.now()
+#end_date = datetime.datetime(2015,1, 1)
+
+df=download(tickerSymbol, start=start_date, end=end_date).reset_index()
+ohlc = df[['Open', 'High', 'Low', 'Close']]
+
+
+df["Doji"]=df.ta.cdl_pattern(name="doji").replace({100: True, 0: False})
+df["Inside"]=df.ta.cdl_pattern(name="inside").replace({1: True,-1: True, 0: False})
+fig, ax = plt.subplots(figsize=(20, 10))
+
+#candlestick2_ochl(ax, ohlc['Open'], ohlc['Close'], ohlc['High'], ohlc['Low'], width=0.6, colorup='g', colordown='r')
+
+doji=df[df["Doji"]]
+inside=df[df["Inside"]]
+
+plt.plot(df.Close, color='green')
+
+plt.style.use('dark_background')
+
+df['Min'] = df.iloc[argrelextrema(df['Close'].values, np.less_equal, order=45)[0]]['Close']
+df['Max'] = df.iloc[argrelextrema(df['Close'].values, np.greater_equal, order=45)[0]]['Close']
+plt.scatter(df.index, df['Min'], color='red',s=200, label='Double Bottom')
+plt.scatter(df.index, df['Max'], color='green', s=200,label='Double Top')
